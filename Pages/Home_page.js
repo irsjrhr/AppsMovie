@@ -6,28 +6,54 @@ import Api_movie from '../Api/Api_movie'
 
 let Home_page = ( {navigation} ) =>{
 
-    let data =[];
 
 
     let [data_movies_popular, set_movies_popular] = useState([]);
     let [data_movies_nowPlaying, set_movies_nowPlaying] = useState([]);
     let [data_movies_upComing, set_movies_upComing] = useState([]);
-    const get_data_all = async function() {
-        const movie_popular = await Api_movie.getMovies_popular();
-        const movie_nowPlaying = await Api_movie.getMovies_nowPlaying();
-        const movie_upComing = await Api_movie.getMovies_upComing();
+    let [data_movies_listGenre, set_movies_listGenre] = useState([]);
 
-        set_movies_popular(movie_popular.results);
-        set_movies_nowPlaying(movie_nowPlaying.results);
-        set_movies_upComing(movie_upComing.results);
+    const get_data_all = function() {
 
-        // console.log( movie_nowPlaying )
+        const get_movie_nowPlaying = Api_movie.getMovies_nowPlaying();
+        get_movie_nowPlaying.then(function(e) {
+            let result = get_movie_nowPlaying._j.results;
+            set_movies_nowPlaying(result);
+        })
+        const get_movie_popular = Api_movie.getMovies_popular();
+        get_movie_popular.then(function(e) {
+            let result = get_movie_popular._j.results;
+            set_movies_popular(result);
+            
+        })
+        const get_movie_upComing = Api_movie.getMovies_upComing();
+        get_movie_upComing.then(function(e) {
+            let result = get_movie_upComing._j.results;
+            set_movies_upComing(result);
+        })
+
+        const get_movie_listGenre = Api_movie.getMovies_listGenre();
+        get_movie_listGenre.then(function(e) {
+            let result = get_movie_listGenre._j.genres;
+            set_movies_listGenre(result);
+        }).catch(function(error) {
+            console.log( error );
+            // Alert.alert("s");
+        });
+
     };
   
     // getMovies_popular()
     useEffect(function(e) {
         get_data_all()
     }, [])
+
+    function movies_direct_kategori( row_genre ) {
+        // row_genre adalah data row untuk data pada genre yang diambil
+        navigation.navigate("Genre_page", { row_genre : row_genre })
+    }
+
+
 
 
 
@@ -41,12 +67,16 @@ let Home_page = ( {navigation} ) =>{
                     {/* View Header - Melayang */}
                     <View style={ style.container_banner.header_home }>
                         
-                        <Image
-                            source={require('../assets/user.jpg')}
-                            style={style.container_banner.header_home.img_profile}
-                        />
                         <View style={ style.container_banner.header_home.col_btn_header }>
-                            <TouchableOpacity onPress={()=>Alert.alert("Test")} style={ style.container_banner.header_home.btn_header }>
+                            <TouchableOpacity onPress={()=> navigation.navigate("Favourite_page") } style={ [style.container_banner.header_home.btn_header,{left:20}] }>
+                                <View>
+                                    <Icon style={ style.container_banner.header_home.btn_header.icon} name="bookmark" size={20} color="#900" />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={ style.container_banner.header_home.col_btn_header }>
+                            <TouchableOpacity onPress={()=> navigation.navigate("Search_page") } style={ style.container_banner.header_home.btn_header }>
                                 <View>
                                     <Icon style={ style.container_banner.header_home.btn_header.icon} name="search" size={20} color="#900" />
                                 </View>
@@ -138,6 +168,44 @@ let Home_page = ( {navigation} ) =>{
 
                 </View>
                 {/* End Of Container Banner */}
+                
+                {/* Container Category */}
+                <View style={{
+                    // backgroundColor: "red",
+             
+                    padding: 20,
+                    marginTop: 10,
+                    paddingRight: 0,
+                    flexDirection: "row"
+                }}>
+                    
+                    <FlatList
+                        horizontal
+                        data={data_movies_listGenre}
+                        renderItem={({ item }) => 
+                            <TouchableOpacity onPress={ () => { movies_direct_kategori( item ) } }>
+                                <View style={{
+                                    width: 100,
+                                    paddingTop: 10,
+                                    height: 50,
+                                    backgroundColor: "grey",
+                                    borderRadius:50,
+                                    marginRight: 10,
+                                    position: "relative"
+                                }}>
+                                    <Text style={{textAlign:"center", color: "white", fontFamily:"poppins"
+
+                                    }}> {item.name} </Text>
+                                </View>
+                            </TouchableOpacity>
+                        }
+                        keyExtractor={(item) => item.id}
+                        // contentContainerStyle={styles.container}
+                    />
+
+                </View>
+                {/* Container Category */}
+
 
                 {/* Container content */}
                 <View style={ style.container_content }>
@@ -159,30 +227,9 @@ let Home_page = ( {navigation} ) =>{
 }
 
 
+import Card_data from "../Component/Card_data";
 let Container_data = ( prop ) => {
 
-    // console.log(prop.data);
-    function movie_detail_page( row_data ){
-        //row ddata result
-        prop.navigation.navigate("Detail_page", {row_data:row_data});
-        
-    }
-
-    let Card_data = ( { item } ) => {
-        return (
-            <TouchableOpacity onPress={()=> { 
-                movie_detail_page( item ) 
-                } }>
-                <View style={ style.row_data.card_data }>
-                    <Image style={ style.row_data.card_data.img }
-                    source={{ uri: Api_movie.get_img( item.poster_path ) }}
-                    >
-    
-                    </Image>
-                </View>
-            </TouchableOpacity>
-        )
-    }
     return (
 
                 <View style={ style.container_data }>
@@ -212,7 +259,7 @@ let Container_data = ( prop ) => {
                             <FlatList
                                 horizontal
                                 data={prop.data}
-                                renderItem={Card_data}
+                                renderItem={({ item }) => <Card_data item={item} navigation={prop.navigation} />}
                                 keyExtractor={(item) => item.id}
                                 // contentContainerStyle={styles.container}
                             />

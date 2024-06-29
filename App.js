@@ -5,12 +5,13 @@ import { Alert, Button, Text, View } from 'react-native';
 import * as Font from 'expo-font';
 import Home_page from './Pages/Home_page';
 import Detail_page from './Pages/Detail_page';
+import Search_page from './Pages/Search_page';
+import Favourite_page from './Pages/Favourite_page';
+import Genre_page from './Pages/Genre_page';
 
 
 
 const Stack = createStackNavigator();
-
-
 
 
 function App() {
@@ -51,6 +52,10 @@ function App() {
           }),
         }}>
         <Stack.Screen name="Home_page" component={Home_page} />
+        <Stack.Screen name="Search_page" component={Search_page} />
+        <Stack.Screen name="Favourite_page" component={Favourite_page} />
+        {/* Yang perlu parameter */}
+        <Stack.Screen name="Genre_page" component={Genre_page} />
         <Stack.Screen name="Detail_page" component={Detail_page} />
       </Stack.Navigator>
     </NavigationContainer>

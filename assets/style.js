@@ -8,7 +8,7 @@ let style = StyleSheet.create({
 
     container_app :{
         // padding: 20,
-        backgroundColor:"black"
+        backgroundColor:"black",
     },
 
     container_banner:{
@@ -91,6 +91,7 @@ let style = StyleSheet.create({
         card_data:{
             width: 100,
             height: 140,
+            position:"relative",
             marginRight: 15,
             flexDirection: "row",
             img:{

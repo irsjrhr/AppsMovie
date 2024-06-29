@@ -3,13 +3,34 @@ import { Image,View, Text, Alert, Touchable, TouchableOpacity, TextInput, Toucha
 import style from "../assets/style"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Api_movie from "../Api/Api_movie";
+import DB_favourite from "../DB/DB_favorite";
+import Base_model from "../Base_model";
+
 
 
 
 let Detail_page = ({ route,navigation }) =>{
 
-    const { row_data } = route.params;
 
+    let { id_movie } = route.params;
+
+
+    // let id_movie = "1022789";
+
+    let [row_data, set_row_data] = useState({});
+    
+    useEffect(function(e) {
+        
+        let row_data_get = Api_movie.getMovies_byId(id_movie)
+        console.log( id_movie );
+        row_data_get.then(function(e) {
+            set_row_data(  row_data_get._j )
+            console.log( row_data );
+            console.log("debug mantap")
+        })
+        
+    }, [])
+     
 
 
 
@@ -21,6 +42,7 @@ let Detail_page = ({ route,navigation }) =>{
     let [ icon_indicator, set_icon_indicator ] = useState(icon_awal);
 
 
+    //Event agar box detail jadi animasi nambah tinggi
     function trigerBoxDetail(){
         if( event_box_detail == false ){
             // Jika belum ada event terjadi pada box detail, maka jalankan 
@@ -37,12 +59,21 @@ let Detail_page = ({ route,navigation }) =>{
     }
 
 
+    // Event ketika book di tekan dan membook movie
+    function book_movie(id_movie) {
+        id_movie = id_movie.toString();
+        DB_favourite.insert_data( id_movie, row_data );
+        console.log( "Tambahkan movie dengan id : " + id_movie );
+        Alert.alert("Berhasil menambahkan film ke bookmark");
+    }
+
+
     return(
             <View style={ [style.container_app, {flexDirection:"row", position:"relative", height:"100%"}] }>
                 
 
                 <Image
-                source={{uri:Api_movie.get_img(row_data.backdrop_path)}}
+                source={{uri:Base_model.get_img_movie(row_data)}}
                 style={{
                     position: "absolute",
                     top: 0,
@@ -107,7 +138,7 @@ let Detail_page = ({ route,navigation }) =>{
                             </TouchableOpacity>
 
                             {/* Play Button */}
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => book_movie( id_movie )}>
                                 <View style={{
                                     width: 60,
                                     height: 60,
